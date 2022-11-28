@@ -27,7 +27,7 @@ export default class IndexPage implements HTMLPageInterFace {
 
     public render() : void { 
         /**
-         * We only quick demo so can use add(). 
+         * We only quick demo so can use action. 
          * But in fact you don't shuold use for main page. 
          * Because all component will render again if main page render again. 
          * 
