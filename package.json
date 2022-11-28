@@ -110,7 +110,6 @@
   },
   "cordova": {
     "platforms": [
-      "browser"
     ],
     "plugins": {
       "vnnative3-cordova-splashscreen": {}
