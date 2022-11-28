@@ -1,5 +1,5 @@
-![alt text](https://raw.githubusercontent.com/steveleetn91/nukejs/master/assets/images/solution.jpg)
-![alt text](https://raw.githubusercontent.com/steveleetn91/nukejs/master/assets/images/logo.png)
+![alt text](https://raw.githubusercontent.com/steveleetn91/NukeJS/master/assets/images/solution.jpg)
+![alt text](https://raw.githubusercontent.com/steveleetn91/NukeJS/master/assets/images/logo.png)
 # NukeJS
 
 NukeJS is a framework useful all platforms, it's help you develop project E-commer, Manager, Chat, Video, Social network ....  
