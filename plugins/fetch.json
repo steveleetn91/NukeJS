@@ -1,0 +1,26 @@
+{
+  "cordova-plugin-device": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-enable-cleartext-traffic": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-enable-cleartext-traffic"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "vnnative3-cordova-splashscreen": {
+    "source": {
+      "type": "registry",
+      "id": "https://github.com/steveleetn91/vnnative3-cordova-splashscreen"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
+}

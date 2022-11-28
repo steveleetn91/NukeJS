@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.example.tani" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>NukeJS</name>
+    <description>NukeJS is an cross platform. It's working in the Typescript.</description>
+    <author email="hoang.le.tn91@gmail.com" href="https://tani.technology">
+        Tani Technology
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-navigation href="*" />
+    <platform name="android">
+        <preference name="SplashScreenDelay" value="1000" />
+    </platform>
+    <platform name="ios">
+        <preference name="SplashScreenDelay" value="1000" />
+    </platform>
+</widget>
