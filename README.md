@@ -1,4 +1,3 @@
-![alt text](https://raw.githubusercontent.com/steveleetn91/NukeJS/main/assets/images/solution.jpg)
 ![alt text](https://raw.githubusercontent.com/steveleetn91/NukeJS/main/assets/images/logo.png)
 # NukeJS
 
@@ -10,15 +9,21 @@ NukeJS using lazy load for all page, so it's ready for big project.
     `Note : We need NodeJS version >= 16.x.x`
 
 
-# Document site
+## Document site
     
     `https://www.vnnativeframework.club/`
-    
 
-# Issue
+If you can't access document version 1.6 ( Nukejs 1.0.0 ) : 
+    `https://vnf3-16x.web.app/`
+
+## Lifecycle 
+
+![alt text](https://raw.githubusercontent.com/steveleetn91/NukeJS/main/readme/NukeJS-lifecycle.jpg)
+
+## Issue
 
 Let's give for me a some issue
     `https://github.com/steveleetn91/nukejs/issues`
 
-# Licence 
+## Licence 
 Licence : MIT
