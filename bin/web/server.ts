@@ -43,6 +43,9 @@ try {
                 });
             });
             http.listen(servePort, (): void => {
+                cli.info(`Currently NukeJS isn't support hot reload for component, so let's change main page
+                to trigger hot reload event`);
+                cli.info(`Let's give for me a Started at github: https://github.com/steveleetn91/NukeJS`);
                 cli.ok(`Server running at http://localhost:${servePort}/`);
             });
         }
@@ -72,7 +75,7 @@ try {
         const reloadEvent: Function = (): void => {
             watcher
                 .on('add', (path: string): void => {
-                    cli.ok(`Added ${path}`)
+                    cli.ok(`Listening ${path}`)
                 })
                 .on('change', (path: string): void => {
                     cli.info("Changed " + path.toString());
@@ -83,7 +86,6 @@ try {
                             .replace('.ts', '')
                             .replace('.scss', '')
                             .replace('.html', '');
-                        console.log('test', path);
                         const totalString = path.split('');
                         let name = '';
                         for (let i = 1; i < (totalString.length / 2); i++) {
