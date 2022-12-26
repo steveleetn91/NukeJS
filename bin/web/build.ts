@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 import * as cli from "cli";
+import ProgressVNF from "./helpers/progress.vnf";
+import ProccessVnfInterface from "./helpers/progress.vnf.interface";
 import WebPackVNF from "./helpers/webpack.vnf";
 const fs = require('fs')
 const BuildframeworkInfo = './framework.json';
 try {
     let BuildwebHelper: WebPackVNF;
     BuildwebHelper = new WebPackVNF();
+    const BuildProgress : ProccessVnfInterface = new ProgressVNF();
+    BuildProgress.init();
     const buildWeb: Function = (next: Function): void => {
         cli.exec("cp -r ./www/* ./platforms/browser/www && cp -r ./framework.json ./platforms/browser/www/framework.json && cp -r ./bin/web/views/production.ejs ./platforms/browser/www/index.html", (resp: any) => {
+            BuildProgress.update(80);
             if (resp) {
                 cli.ok("Done build web!!" + resp.toString());
                 return next();
@@ -16,6 +21,7 @@ try {
     }
     const buildRouter: Function = (next: Function): void => {
         cli.exec("rm -rf ./www/assets", (resp: any) : Function => {
+            BuildProgress.update(20);
             if (resp) {
                 cli.info("Core build" + resp.toString());
                 BuildwebHelper.buildRouterPage();
@@ -26,8 +32,10 @@ try {
     }
     const cleanCachePage: Function = (next: Function): void => {
         cli.exec("rm -rf ./bin/web/tmp/pages/*.ts", (resp) : Function => {
+            BuildProgress.update(30);
             return next();
         }, (resp) : Function => {
+            BuildProgress.update(30);
             return next();
         })
     }
@@ -42,6 +50,7 @@ try {
             BuildwebHelper.buildSinglePage(listPageNeedBuild[key], true, () => {
                 if ((key + 1) < listPageNeedBuild.length) {
                     robotLoadPage(listPageNeedBuild, key + 1);
+                    BuildProgress.increment();
                 } else if ((key + 1) == listPageNeedBuild.length) {
                     return next();
                 }
@@ -53,8 +62,8 @@ try {
         const lazyloadTemplate = await fs.readFileSync('./bin/web/tmp/lazyload.vnf',
             { encoding: 'utf8', flag: 'r' });
         const listPage = BuildwebHelper.listPage();
-
         for (let i = 0; i < listPage.length; i++) {
+            await BuildProgress.increment();
             let page = listPage[i];
             page = page.toString().replaceAll('.ts', '');
             const tmp_lazyloadTemplate = lazyloadTemplate.replaceAll('{page_name}', page);
@@ -72,7 +81,9 @@ try {
                         cleanCachePage(() => {
                             buildPage(() => {
                                 buildWeb(() => {
+                                    BuildProgress.update(100);
                                     cli.ok("Done");
+                                    BuildProgress.stop();
                                 });
                             });
                         });
