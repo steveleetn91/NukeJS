@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import * as cli from "cli";;
+import * as cli from "cli";
+import ProgressVNF from "./helpers/progress.vnf";
+import ProccessVnfInterface from "./helpers/progress.vnf.interface";
 import WebPackVNF from "./helpers/webpack.vnf";
 import * as express from "express";
 const serveFs = require('fs')
@@ -16,9 +18,12 @@ const io = require('socket.io')(http);
 const packageJSON = require('../../../package.json');
 try {
     let webHelper: WebPackVNF;
-    webHelper = new WebPackVNF();
+    webHelper = new WebPackVNF();    
+    const BuildProgress : ProccessVnfInterface = new ProgressVNF();
+    BuildProgress.init();
     if (serveFs.existsSync(frameworkInfo)) {
         webHelper.buildRouterPage();
+        BuildProgress.update(100);
         const myServe: Function = (): void => {
             app.set('view engine', 'ejs');
             app.use(express.static(`${__dirname}/../../../platforms/browser/www`));
@@ -78,6 +83,13 @@ try {
                     cli.ok(`Listening ${path}`)
                 })
                 .on('change', (path: string): void => {
+                    BuildProgress.init();
+                    for(let _i=0;_i<99;_i++){
+                        
+                        setTimeout(() => {
+                            BuildProgress.update(_i);
+                        }, _i * 10);
+                    }
                     cli.info("Changed " + path.toString());
                     if (path.includes('.ts') || path.includes('.scss') || path.includes('.html')) {
                         path = path.replace(_path.join(__dirname, "/../../../pages"), '')
@@ -92,9 +104,12 @@ try {
                             name += totalString[i];
                             if ((i + 1) === (totalString.length / 2)) {
                                 webHelper.buildSinglePage(name, true, () => {
+                                    
                                     applyChangeForPlatforms(name,() => {
                                         io.emit('has reload', `Rebuild ${name}`);
-                                        cli.ok(`Rebuild ${name}`)
+                                        cli.ok(`Rebuild ${name}`);
+                                        BuildProgress.update(100);
+                                        BuildProgress.stop();
                                     })
                                 });
                             }
