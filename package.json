@@ -62,7 +62,10 @@
   },
   "homepage": "https://github.com/steveleetn91/vn-native-3#readme",
   "devDependencies": {
+    "@babel/core": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
     "@types/node": "^16.11.22",
+    "babel-loader": "^9.1.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-enable-cleartext-traffic": "^2.1.0",
