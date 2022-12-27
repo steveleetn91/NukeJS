@@ -7,21 +7,48 @@ const fs = require('fs');
 const webpack = require('webpack');
 const output = `${__dirname}/../../../../www/assets`;
 const iosOutput = `${__dirname}/../../../../platforms/ios/www`
-const staticDirectory = `${__dirname}/../../../../www`;
-const iosStaticDirectory = `${__dirname}/../../../../www`
-
-let configWebServe = require("../../../../config/config.json");
-
-let servePort :number = configWebServe.PORT ? configWebServe.PORT : 9000;
-
-const ProxConfig = {
-    secure: true,
-    changeOrigin: false
-};
+const minimizer = [
+    new CssMinimizerPlugin(),
+    '...'
+];
+const rules = [
+    {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+    },
+    {
+        test: /.s?css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+    },
+    {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+            {
+                loader: 'file-loader',
+            },
+        ],
+    },
+    {
+        test: /\.html$/i,
+        loader: "html-loader",
+    },
+    {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+            loader: 'babel-loader',
+            options: {
+                presets: ['@babel/preset-env'],
+                plugins: ['@babel/plugin-proposal-object-rest-spread']
+            }
+        }
+    }
+];
 export default class WebPackVNF implements WebPackVNFInterface {
-    listPage() : Array<string> {
+    listPage(): Array<string> {
         const directoryPage = __dirname + '/../../../../pages';
-        let data : Array<string>
+        let data: Array<string>
         data = [];
         let list = fs.readdirSync(directoryPage);
         if (list.length < 1) {
@@ -29,9 +56,9 @@ export default class WebPackVNF implements WebPackVNFInterface {
         }
         return list;
     }
-    listPageNeedBuild() : Array<string>{
+    listPageNeedBuild(): Array<string> {
         const directoryPage = __dirname + '/../../../../bin/web/tmp/pages/';
-        let data : Array<string>;
+        let data: Array<string>;
         data = []
         let list = fs.readdirSync(directoryPage);
         if (list.length < 1) {
@@ -47,8 +74,8 @@ export default class WebPackVNF implements WebPackVNFInterface {
             }
         }
     }
-    buildSinglePage(pageName : string,rebuild : boolean = true,callback : Function) : void {
-        const build : Function = async (next : Function) : Promise<Function> => {
+    buildSinglePage(pageName: string, rebuild: boolean = true, callback: Function): void {
+        const build: Function = async (next: Function): Promise<Function> => {
             const lazyloadTemplate = await fs.readFileSync(`${__dirname}/../../../../bin/web/tmp/lazyload.vnf`,
                 { encoding: 'utf8', flag: 'r' });
 
@@ -56,22 +83,19 @@ export default class WebPackVNF implements WebPackVNFInterface {
             fs.writeFileSync(`${__dirname}/../../../../bin/web/tmp/pages/${pageName}.ts`, tmp_lazyloadTemplate);
             return next();
         }
-        let entry : any = {}
+        let entry: any = {}
         entry[pageName] = `${__dirname}/../../../../bin/web/tmp/pages/${pageName}.ts`
         const config = {
             entry: entry,
             mode: "production",
-            devtool: "inline-source-map",
+            devtool: "eval-cheap-source-map",
             output: {
                 filename: '[name].bundle.js',
                 path: output + `/${pageName}`,
                 clean: rebuild,
             },
             optimization: {
-                minimizer: [
-                    new CssMinimizerPlugin(),
-
-                ],
+                minimizer: minimizer
             },
             plugins: [
                 new MiniCssExtractPlugin({
@@ -79,43 +103,10 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 })
             ],
             module: {
-                rules: [
-                    {
-                        test: /\.tsx?$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/,
-                    },
-                    {
-                        test: /.s?css$/,
-                        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-                    },
-                    {
-                        test: /\.(png|jpe?g|gif)$/i,
-                        use: [
-                            {
-                                loader: 'file-loader',
-                            },
-                        ],
-                    },
-                    {
-                        test: /\.html$/i,
-                        loader: "html-loader",
-                    }
-                ],
+                rules: rules,
             },
             resolve: {
                 extensions: ['.tsx', '.ts', '.js'],
-            },
-            devServer: {
-                static: {
-                    directory: staticDirectory,
-                },
-                port: servePort,
-                compress: false,
-                liveReload: false,
-                proxy: {
-                    "/page": ProxConfig,
-                }
             },
             performance: {
                 hints: "warning",
@@ -123,41 +114,37 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 maxAssetSize: 2560000
             }
         }
-        build(() : void => {
-            webpack(config, (err : any, stats: any) : void => {
+        build((): void => {
+            webpack(config, (err: any, stats: any): void => {
                 if (err) {
-                     cli.error(err.toString());
+                    cli.error(err.toString());
                 }
 
                 if (stats.hasErrors()) {
-                     cli.error(stats.toString());
+                    cli.error(stats.toString());
                 }
 
-                 cli.info(stats);
-                 if(callback) {
-                     return callback();
-                 }
+                cli.info(stats);
+                if (callback) {
+                    callback();
+                }
             });
         });
     }
-    buildRouterPage (rebuild : boolean = true) : void {
+    buildRouterPage(rebuild: boolean = true): void {
         const config = {
             entry: {
-                app : `${__dirname}/../../../../src/bootstrap.ts`,
+                app: `${__dirname}/../../../../src/bootstrap.ts`,
             },
-            mode:"production",
-            devtool: "inline-source-map",
+            mode: "production",
+            devtool: "eval-cheap-source-map",
             output: {
                 filename: '[name].bundle.js',
                 path: output + '/app',
                 clean: rebuild,
             },
             optimization: {
-                minimizer: [
-                    
-                    new CssMinimizerPlugin(),
-        
-                ],
+                minimizer: minimizer
             },
             plugins: [
                 new MiniCssExtractPlugin({
@@ -165,43 +152,10 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 })
             ],
             module: {
-                rules: [
-                    {
-                        test: /\.tsx?$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/,
-                    },
-                    {
-                        test: /.s?css$/,
-                        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-                    },
-                    {
-                        test: /\.(png|jpe?g|gif)$/i,
-                        use: [
-                            {
-                                loader: 'file-loader',
-                            },
-                        ],
-                    },
-                    {
-                        test: /\.html$/i,
-                        loader: "html-loader",
-                    }
-                ],
+                rules: rules,
             },
             resolve: {
                 extensions: ['.tsx', '.ts', '.js'],
-            },
-            devServer: {
-                static: {
-                    directory: staticDirectory,
-                },
-                port: servePort,
-                compress: false,
-                liveReload:true,
-                proxy: {
-                    "/page": ProxConfig,
-                }
             },
             performance: {
                 hints: "warning",
@@ -209,20 +163,22 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 maxAssetSize: 2560000
             }
         }
-        webpack(config, (err : any, stats : any) : void | string => {
+        webpack(config, (err: any, stats: any): void => {
             if (err) {
-                return cli.error(err.toString());
+                cli.error(err.toString());
+                return;
             }
 
             if (stats.hasErrors()) {
-                return cli.error(stats.toString());
+                cli.error(stats.toString());
+                return;
             }
 
-            return cli.info(stats);
+            cli.info(stats);
         });
     }
-    buildSinglePageiOS(pageName : string,rebuild : boolean = true,callback : Function) : void {
-        const build = async (next : Function) => {
+    buildSinglePageiOS(pageName: string, rebuild: boolean = true, callback: Function): void {
+        const build = async (next: Function) => {
             const lazyloadTemplate = await fs.readFileSync(`${__dirname}/../../../../bin/web/tmp/lazyload.vnf`,
                 { encoding: 'utf8', flag: 'r' });
 
@@ -230,23 +186,19 @@ export default class WebPackVNF implements WebPackVNFInterface {
             fs.writeFileSync(`${__dirname}/../../../../bin/web/tmp/pages/${pageName}.ts`, tmp_lazyloadTemplate);
             return next();
         }
-        let entry : any = {};
+        let entry: any = {};
         entry[pageName] = `${__dirname}/../../../../bin/web/tmp/pages/${pageName}.ts`
         const config = {
             entry: entry,
             mode: "production",
-            devtool: "inline-source-map",
+            devtool: "eval-cheap-source-map",
             output: {
                 filename: '[name].bundle.js',
                 path: iosOutput + `/`,
                 clean: rebuild,
             },
             optimization: {
-                minimizer: [
-                    
-                    new CssMinimizerPlugin(),
-
-                ],
+                minimizer: minimizer
             },
             plugins: [
                 new MiniCssExtractPlugin({
@@ -254,43 +206,10 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 })
             ],
             module: {
-                rules: [
-                    {
-                        test: /\.tsx?$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/,
-                    },
-                    {
-                        test: /.s?css$/,
-                        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-                    },
-                    {
-                        test: /\.(png|jpe?g|gif)$/i,
-                        use: [
-                            {
-                                loader: 'file-loader',
-                            },
-                        ],
-                    },
-                    {
-                        test: /\.html$/i,
-                        loader: "html-loader",
-                    }
-                ],
+                rules: rules,
             },
             resolve: {
                 extensions: ['.tsx', '.ts', '.js'],
-            },
-            devServer: {
-                static: {
-                    directory: iosStaticDirectory,
-                },
-                port: servePort,
-                compress: false,
-                liveReload: false,
-                proxy: {
-                    "/page": ProxConfig,
-                }
             },
             performance: {
                 hints: "warning",
@@ -298,41 +217,39 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 maxAssetSize: 2560000
             }
         }
-        build(() : void => {
-            webpack(config, (err : any, stats : any) : void | Function => {
+        build((): void => {
+            webpack(config, (err: any, stats: any): void | Function => {
                 if (err) {
-                     cli.error(err.toString());
+                    cli.error(err.toString());
+                    return;
                 }
 
                 if (stats.hasErrors()) {
-                     cli.error(stats.toString());
+                    cli.error(stats.toString());
+                    return;
                 }
 
-                 cli.info(stats);
-                 if(callback) {
-                     return callback();
-                 }
+                cli.info(stats);
+                if (callback) {
+                    return callback();
+                }
             });
         });
     }
-    buildRouterPageiOS(rebuild : boolean = true) : void {
+    buildRouterPageiOS(rebuild: boolean = true): void {
         const config = {
             entry: {
-                app : `${__dirname}/../../../../src/bootstrap.ts`,
+                app: `${__dirname}/../../../../src/bootstrap.ts`,
             },
-            mode:"production",
-            devtool: "inline-source-map",
+            mode: "production",
+            devtool: "eval-cheap-source-map",
             output: {
                 filename: '[name].bundle.js',
                 path: iosOutput + '/',
                 clean: rebuild,
             },
             optimization: {
-                minimizer: [
-                    
-                    new CssMinimizerPlugin(),
-        
-                ],
+                minimizer: minimizer
             },
             plugins: [
                 new MiniCssExtractPlugin({
@@ -340,43 +257,10 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 })
             ],
             module: {
-                rules: [
-                    {
-                        test: /\.tsx?$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/,
-                    },
-                    {
-                        test: /.s?css$/,
-                        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-                    },
-                    {
-                        test: /\.(png|jpe?g|gif)$/i,
-                        use: [
-                            {
-                                loader: 'file-loader',
-                            },
-                        ],
-                    },
-                    {
-                        test: /\.html$/i,
-                        loader: "html-loader",
-                    }
-                ],
+                rules: rules,
             },
             resolve: {
                 extensions: ['.tsx', '.ts', '.js'],
-            },
-            devServer: {
-                static: {
-                    directory: iosStaticDirectory,
-                },
-                port: servePort,
-                compress: false,
-                liveReload:true,
-                proxy: {
-                    "/page": ProxConfig,
-                }
             },
             performance: {
                 hints: "warning",
@@ -384,16 +268,18 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 maxAssetSize: 2560000
             }
         }
-        webpack(config, (err : any, stats : any) : void | Function => {
+        webpack(config, (err: any, stats: any): void => {
             if (err) {
-                return cli.error(err.toString());
+                cli.error(err.toString());
+                return;
             }
 
             if (stats.hasErrors()) {
-                return cli.error(stats.toString());
+                cli.error(stats.toString());
+                return;
             }
 
-            return cli.info(stats);
+            cli.info(stats);
         });
     }
 }
