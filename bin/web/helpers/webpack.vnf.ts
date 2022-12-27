@@ -118,13 +118,15 @@ export default class WebPackVNF implements WebPackVNFInterface {
             webpack(config, (err: any, stats: any): void => {
                 if (err) {
                     cli.error(err.toString());
+                    return;
                 }
 
                 if (stats.hasErrors()) {
                     cli.error(stats.toString());
+                    return;
                 }
 
-                cli.info(stats);
+                //cli.info(stats);
                 if (callback) {
                     callback();
                 }
@@ -173,8 +175,6 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 cli.error(stats.toString());
                 return;
             }
-
-            cli.info(stats);
         });
     }
     buildSinglePageiOS(pageName: string, rebuild: boolean = true, callback: Function): void {
@@ -218,7 +218,7 @@ export default class WebPackVNF implements WebPackVNFInterface {
             }
         }
         build((): void => {
-            webpack(config, (err: any, stats: any): void | Function => {
+            webpack(config, (err: any, stats: any): void => {
                 if (err) {
                     cli.error(err.toString());
                     return;
@@ -231,7 +231,7 @@ export default class WebPackVNF implements WebPackVNFInterface {
 
                 cli.info(stats);
                 if (callback) {
-                    return callback();
+                    callback();
                 }
             });
         });
@@ -278,8 +278,6 @@ export default class WebPackVNF implements WebPackVNFInterface {
                 cli.error(stats.toString());
                 return;
             }
-
-            cli.info(stats);
         });
     }
 }

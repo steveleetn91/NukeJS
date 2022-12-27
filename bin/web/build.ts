@@ -9,21 +9,17 @@ try {
     let BuildwebHelper: WebPackVNF;
     BuildwebHelper = new WebPackVNF();
     const BuildProgress : ProccessVnfInterface = new ProgressVNF();
-    BuildProgress.init();
+    BuildProgress.init(100);
     const buildWeb: Function = (next: Function): void => {
         cli.exec("cp -r ./www/* ./platforms/browser/www && cp -r ./framework.json ./platforms/browser/www/framework.json && cp -r ./bin/web/views/production.ejs ./platforms/browser/www/index.html", (resp: any) => {
-            BuildProgress.update(80);
             if (resp) {
-                cli.ok("Done build web!!" + resp.toString());
                 return next();
             }
         });
     }
     const buildRouter: Function = (next: Function): void => {
         cli.exec("rm -rf ./www/assets", (resp: any) : Function => {
-            BuildProgress.update(20);
             if (resp) {
-                cli.info("Core build" + resp.toString());
                 BuildwebHelper.buildRouterPage();
                 return next();
             }
@@ -32,15 +28,13 @@ try {
     }
     const cleanCachePage: Function = (next: Function): void => {
         cli.exec("rm -rf ./bin/web/tmp/pages/*.ts", (resp) : Function => {
-            BuildProgress.update(30);
             return next();
         }, (resp) : Function => {
-            BuildProgress.update(30);
             return next();
         })
     }
     const buildPage: Function = (next: Function): void => {
-        cli.info("Some times us need the wait");
+        //cli.info("Some times us need the wait");
         let listPageNeedBuild: Array<string>
         listPageNeedBuild = BuildwebHelper.listPage();
         /**
@@ -50,7 +44,6 @@ try {
             BuildwebHelper.buildSinglePage(listPageNeedBuild[key], true, () => {
                 if ((key + 1) < listPageNeedBuild.length) {
                     robotLoadPage(listPageNeedBuild, key + 1);
-                    BuildProgress.increment();
                 } else if ((key + 1) == listPageNeedBuild.length) {
                     return next();
                 }
@@ -63,7 +56,6 @@ try {
             { encoding: 'utf8', flag: 'r' });
         const listPage = BuildwebHelper.listPage();
         for (let i = 0; i < listPage.length; i++) {
-            await BuildProgress.increment();
             let page = listPage[i];
             page = page.toString().replaceAll('.ts', '');
             const tmp_lazyloadTemplate = lazyloadTemplate.replaceAll('{page_name}', page);
@@ -82,8 +74,8 @@ try {
                             buildPage(() => {
                                 buildWeb(() => {
                                     BuildProgress.update(100);
-                                    cli.ok("Done");
                                     BuildProgress.stop();
+                                    cli.ok("Done");
                                 });
                             });
                         });

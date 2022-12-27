@@ -19,11 +19,8 @@ const packageJSON = require('../../../package.json');
 try {
     let webHelper: WebPackVNF;
     webHelper = new WebPackVNF();    
-    const BuildProgress : ProccessVnfInterface = new ProgressVNF();
-    BuildProgress.init();
     if (serveFs.existsSync(frameworkInfo)) {
         webHelper.buildRouterPage();
-        BuildProgress.update(100);
         const myServe: Function = (): void => {
             app.set('view engine', 'ejs');
             app.use(express.static(`${__dirname}/../../../platforms/browser/www`));
@@ -80,23 +77,17 @@ try {
         const reloadEvent: Function = (): void => {
             watcher
                 .on('add', (path: string): void => {
-                    cli.ok(`Listening ${path}`)
-                })
+                    cli.ok(`Listening ${path}`);
+                }) 
                 .on('change', (path: string): void => {
-                    BuildProgress.init();
-                    for(let _i=0;_i<99;_i++){
-                        
-                        setTimeout(() => {
-                            BuildProgress.update(_i);
-                        }, _i * 10);
-                    }
-                    cli.info("Changed " + path.toString());
+                    const BuildProgress : ProccessVnfInterface = new ProgressVNF();
+                    BuildProgress.init(30);
                     if (path.includes('.ts') || path.includes('.scss') || path.includes('.html')) {
                         path = path.replace(_path.join(__dirname, "/../../../pages"), '')
                             .replace('.Interface.ts', '')
                             .replace('.Service.ts', '')
-                            .replace('.ts', '')
-                            .replace('.scss', '')
+                            .replace('.ts', '') 
+                            .replace('.scss', '') 
                             .replace('.html', '');
                         const totalString = path.split('');
                         let name = '';
@@ -105,11 +96,12 @@ try {
                             if ((i + 1) === (totalString.length / 2)) {
                                 webHelper.buildSinglePage(name, true, () => {
                                     
-                                    applyChangeForPlatforms(name,() => {
-                                        io.emit('has reload', `Rebuild ${name}`);
-                                        cli.ok(`Rebuild ${name}`);
-                                        BuildProgress.update(100);
-                                        BuildProgress.stop();
+                                    applyChangeForPlatforms(name,async () => {
+                                        await io.emit('has reload', `Rebuild ${name}`);
+                                        await cli.ok(`Rebuild ${name}`);
+                                        await BuildProgress.update(100);
+                                        await BuildProgress.stop();
+                                        await cli.info("Ctr + C to close serve");
                                     })
                                 });
                             }
