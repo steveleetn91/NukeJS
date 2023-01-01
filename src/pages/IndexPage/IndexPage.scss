@@ -1,0 +1,39 @@
+/**
+ @ Don't include global.css at assets directory 
+**/
+$theme-color : rgb(29, 116, 29);
+.box-container {
+    .box-count {
+        margin-top: 120px;
+        text-align: center;
+        font-size: 55px;
+    }
+    .box-button {
+        margin-top: 120px;
+        text-align: center;
+        .increase-button {
+            width: 150px;
+            height: 50px;
+            background-color: rgba(204, 204, 204, 0);
+            border-color: $theme-color;
+            border-radius: 10px;
+            font-size: 20px; 
+            color: $theme-color;
+        }
+        .example-button {
+            width: 150px;
+            height: 50px;
+            background-color: rgba(204, 204, 204, 0);
+            border-radius: 10px;
+            font-size: 20px; 
+        }
+    }
+    .box-value {
+        text-align: center;
+        input {
+            width: 200px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+    }
+}

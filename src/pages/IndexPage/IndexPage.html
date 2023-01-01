@@ -1,0 +1,21 @@
+<div class="info-box">
+    {{{header}}}
+    <div class="box-container">
+        <div class="box-count">
+            {{point}}
+        </div>
+        <div class="box-value">
+            <input type="number" minlength="0" onchange="nukepage.onchangeInput(this.value)" value="{{point}}"/>
+        </div>
+        <div class="box-button">
+            <button class="increase-button" id="increase-button" onclick="nukepage.addPoint()">
+                + 1 point
+            </button> 
+        </div>
+        <div class="box-button">
+            <a class="example-button" id="example-button" link="/example">
+                Example Page
+            </a>  
+        </div>
+    </div>  
+</div> 

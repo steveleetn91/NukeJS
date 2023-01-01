@@ -1,0 +1,17 @@
+.app-header {
+    background-color: rgb(9, 175, 6);
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    display: grid;
+    .header-text {
+        text-align: center;
+        p {
+            padding: 5px;
+            font-size: 20px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 3px #ccc;
+            font-weight: bold;
+        }
+    }
+}
