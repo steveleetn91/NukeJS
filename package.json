@@ -49,7 +49,7 @@
   "dependencies": {
     "mustache": "^4.2.0",
     "nukejs-cli": "^1.0.10",
-    "nukejs-router": "^1.1.6",
+    "nukejs-router": "^1.1.15",
     "vnnative3-webview": "^1.1.0"
   }
 }

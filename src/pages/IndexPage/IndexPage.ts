@@ -1,5 +1,6 @@
 import HTMLPageInterFace from 'vnnative3-webview/dist/HTMLPage'
 import VnNative3HTMLElement from 'vnnative3-webview/dist/HTMLElement/index';
+import NukeJSRoute from "nukejs-router/dist/libs/NukeJSRoute";
 import './IndexPage.scss';
 import IndexPageStateInterface from './IndexPage.State.Interface';
 import header from '../../components/header/header';
@@ -10,10 +11,13 @@ export default class IndexPage implements HTMLPageInterFace {
         header : header(),
         point : 0
     };  
+    route : NukeJSRoute = new NukeJSRoute();
     constructor() {}      
-    public beforeRender() : void {}   
+    public beforeRender() : void {
+        console.log('this.route',this.route);
+    }   
     public afterRender() : void { 
-          
+           
     }      
     addPoint(){
         this.state.point +=1;

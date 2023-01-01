@@ -13,6 +13,14 @@ export default class RouterConfig {
                 page:import("./pages/ExamplePage/ExamplePage")
             },
             {
+                url:"/example/$slug",
+                page:import("./pages/ExamplePage/ExamplePage")
+            },
+            {
+                url:"/$id/$slug",
+                page: import("./pages/IndexPage/IndexPage")
+            },
+            {
                 url:"/index.html",
                 page:import("./pages/IndexPage/IndexPage")
             }
